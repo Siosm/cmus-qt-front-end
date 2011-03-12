@@ -59,7 +59,7 @@ signals:
     void statusUpdated();
 
     /* Helpers */
-    void stateChanged(CMusState curState);
+    void stateChanged(QCmusRemote::CMusState curState);
     void positionUpdated(int pos);
     void volumeUpdated(int level);
     void newSongPlayed(const QString& artist,

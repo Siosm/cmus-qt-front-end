@@ -17,6 +17,7 @@ public:
     ~MainWindow();
 
 private slots:
+    void cmusStateChanged(QCmusRemote::CMusState curState);
     void newSongPlayed(const QString& artist,
                        const QString& album,
                        const QString& title,
