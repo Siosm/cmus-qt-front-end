@@ -4,6 +4,8 @@
 QCmusRemote::QCmusRemote(QObject *parent) :
     QObject(parent), socket(NULL)
 {
+    QObject::connect(&upTimer, SIGNAL(timeout()), this, SLOT(update()));
+    setRefreshInterval(250);
 }
 
 void QCmusRemote::statusUpdated(QMap<QString, QString> newState)
@@ -18,15 +20,33 @@ void QCmusRemote::statusUpdated(QMap<QString, QString> newState)
         {
             updated = true;
 
-            if (i.key() == "position")
+            if (i.key() == "status")
+            {
+                if (i.value() == "playing")
+                    curState = PLAYING;
+                else if (i.value() == "paused")
+                    curState = PAUSED;
+                else if (i.value() == "stopped")
+                    curState = STOPPED;
+
+                emit stateChanged(curState);
+            }
+            else if (i.key() == "file")
+            {
+                emit newSongPlayed(newState["artist"],
+                                   newState["album"],
+                                   newState["title"],
+                                   newState["file"],
+                                   newState["duration"].toInt());
+            }
+            else if (i.key() == "position") /* TODO: Make sure it is never called before newSongPlayed() */
                 emit positionUpdated(i.value().toInt());
-            else if (i.key() == "duration")
-                emit durationUpdated(i.value().toInt());
-            else if (i.key() == "vol_left")
+            else if (i.key() == "vol_left" || i.key() == "vol_right")
                 emit volumeUpdated(i.value().toInt());
         }
-        cout << i.key() << ": " << i.value() << endl;
     }
+
+    status = newState;
 
     if (updated)
         emit statusUpdated();
@@ -46,7 +66,7 @@ QByteArray QCmusRemote::sendCmd(QString cmd)
 
     socket->waitForReadyRead(100);
 
-    while (socket->isReadable() && ret.right(2) != "\n\n")
+    while (socket->isReadable() && ret.right(2) != "\n\n" && ret != "\n")
     {
         char buf[999];
         qint64 len = socket->readLine(buf, sizeof(buf));
@@ -95,6 +115,12 @@ bool QCmusRemote::connect()
     return connect(path);
 }
 
+void QCmusRemote::setRefreshInterval(unsigned int msec)
+{
+    upTimer.setInterval(msec);
+    upTimer.start();
+}
+
 bool QCmusRemote::update()
 {
     QMap<QString, QString> newState;
@@ -124,3 +150,54 @@ bool QCmusRemote::update()
     return true;
 }
 
+void QCmusRemote::toogleRepeat()
+{
+    sendCmd("toggle repeat");
+}
+
+void QCmusRemote::tootleShuffle()
+{
+    sendCmd("toggle repeat");
+}
+
+void QCmusRemote::stop()
+{
+    sendCmd("player-stop");
+}
+
+void QCmusRemote::next()
+{
+    sendCmd("player-next");
+}
+
+void QCmusRemote::prev()
+{
+    sendCmd("player-prev");
+}
+
+void QCmusRemote::play()
+{
+    sendCmd("player-play");
+}
+
+void QCmusRemote::pause()
+{
+    sendCmd("player-pause");
+}
+
+void QCmusRemote::playFile(const QString& file)
+{
+    sendCmd(QString("player-play %1").arg(file));
+}
+
+void QCmusRemote::setVolume(int vol)
+{
+    sendCmd(QString("vol %1").arg(vol*255/100));
+    qDebug("Set volume %i", vol*255/100);
+}
+
+void QCmusRemote::setPosition(int pos)
+{
+    sendCmd(QString("seek %1").arg(pos));
+    qDebug("Set position!");
+}
