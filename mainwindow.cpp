@@ -23,6 +23,21 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->playButton, SIGNAL(clicked()), &remote, SLOT(pause()));
     connect(ui->nextButton, SIGNAL(clicked()), &remote, SLOT(next()));
 
+    //FIXME find the right icon for the quit action!
+    quitAction = new QAction(style()->standardIcon(QStyle::SP_DialogCloseButton), tr("&Quit"), this);
+    connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+
+    trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(quitAction);
+    trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setContextMenu(trayIconMenu);
+    trayIcon->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    trayIcon->show();
+    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+            this, SLOT(systemTrayActivated(QSystemTrayIcon::ActivationReason)));
+
+    setWindowIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+
     if (!remote.connect())
         QMessageBox::critical(this, tr("CMus connection Error"), tr("Couldn't connect to CMus. Please check your settings"));
 }
@@ -49,4 +64,17 @@ void MainWindow::newSongPlayed(const QString& artist,
     ui->playingSlider->setMaximum(duration);
     ui->artistLabel->setText(artist);
     ui->albumLabel->setText(album);
+}
+
+void MainWindow::systemTrayActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    switch(reason){
+        case QSystemTrayIcon::Trigger:
+        case QSystemTrayIcon::DoubleClick:
+            if(this->isVisible())
+                QMainWindow::setVisible(false);
+            else
+                QMainWindow::setVisible(true);
+            break;
+    }
 }

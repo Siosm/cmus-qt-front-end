@@ -11,13 +11,13 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    mainwindow2.cpp \
-    qcmusremote.cpp
+            mainwindow.cpp \
+            mainwindow2.cpp \
+            qcmusremote.cpp
 
 HEADERS  += mainwindow.h \
-    mainwindow2.h \
-    qcmusremote.h
+            mainwindow2.h \
+            qcmusremote.h
 
 FORMS    += mainwindow.ui \
-    mainwindow2.ui
+            mainwindow2.ui

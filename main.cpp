@@ -7,18 +7,19 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
+    app.setApplicationName("Qtmus");
 
     if (!QSystemTrayIcon::isSystemTrayAvailable()) {
         QMessageBox::critical(0, QObject::tr("Systray"),
                               QObject::tr("I couldn't detect any system tray "
                                           "on this system."));
-        return 1;
+        QApplication::setQuitOnLastWindowClosed(true);
     }
-    //QApplication::setQuitOnLastWindowClosed(false);
+    QApplication::setQuitOnLastWindowClosed(false);
 
     MainWindow w;
     w.show();
 
-    return a.exec();
+    return app.exec();
 }
