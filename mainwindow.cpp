@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->playButton, SIGNAL(clicked()), &remote, SLOT(pause()));
     connect(ui->nextButton, SIGNAL(clicked()), &remote, SLOT(next()));
 
-    //FIXME find the right icon for the quit action!
+    //FIXME : find the right icon for the quit action!
     quitAction = new QAction(style()->standardIcon(QStyle::SP_DialogCloseButton), tr("&Quit"), this);
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
@@ -64,6 +64,7 @@ void MainWindow::newSongPlayed(const QString& artist,
     ui->playingSlider->setMaximum(duration);
     ui->artistLabel->setText(artist);
     ui->albumLabel->setText(album);
+    ui->trackNameLabel->setText(title);
 }
 
 void MainWindow::systemTrayActivated(QSystemTrayIcon::ActivationReason reason)

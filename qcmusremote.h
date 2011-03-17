@@ -12,7 +12,7 @@ class QCmusRemote : public QObject
 {
     Q_OBJECT
 public:
-        enum CMusState { STOPPED, PAUSED, PLAYING };
+    enum CMusState { STOPPED, PAUSED, PLAYING };
 
 private:
     QTimer upTimer;

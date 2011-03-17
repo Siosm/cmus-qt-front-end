@@ -709,7 +709,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Current track | Currently playing library || playlist || playqueue</string>
+          <string>Currently playing library || playlist || playqueue</string>
          </property>
          <property name="flat">
           <bool>false</bool>
@@ -795,6 +795,19 @@
               </widget>
              </item>
              <item>
+              <widget class="QLabel" name="label_5">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>-</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QLabel" name="albumLabel">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
@@ -804,6 +817,19 @@
                </property>
                <property name="text">
                 <string>Album</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_4">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>-</string>
                </property>
               </widget>
              </item>
@@ -821,6 +847,19 @@
               </widget>
              </item>
              <item>
+              <widget class="QLabel" name="label_6">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>. </string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QLabel" name="trackNameLabel">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
@@ -832,6 +871,19 @@
                 <string>Track Name</string>
                </property>
               </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
              </item>
             </layout>
            </widget>
@@ -983,7 +1035,7 @@
      <x>0</x>
      <y>0</y>
      <width>675</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
