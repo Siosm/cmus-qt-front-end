@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <QSystemTrayIcon>
+#include <QMenu>
+#include <QFileSystemModel>
+#include <QTreeView>
 
 #include "qcmusremote.h"
 
@@ -35,6 +38,10 @@ private:
     QSystemTrayIcon *trayIcon;
     QMenu *trayIconMenu;
     QAction *quitAction;
+
+    QMenu *fileMenu;
+
+	QFileSystemModel *browserModel;
 };
 
 #endif // MAINWINDOW_H

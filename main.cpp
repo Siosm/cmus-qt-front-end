@@ -15,10 +15,11 @@ int main(int argc, char *argv[])
                               QObject::tr("No system tray detected on this system."));
         QApplication::setQuitOnLastWindowClosed(true);
     }
-    QApplication::setQuitOnLastWindowClosed(false);
+	// TODO : uncomment this line when ready
+    //QApplication::setQuitOnLastWindowClosed(false);
 
     MainWindow w;
-    w.show();
+	w.showMaximized();
 
     return app.exec();
 }

@@ -25,7 +25,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //FIXME : find the right icon for the quit action!
     quitAction = new QAction(style()->standardIcon(QStyle::SP_DialogCloseButton), tr("&Quit"), this);
+    quitAction->setShortcuts(QKeySequence::Quit);
+    quitAction->setStatusTip(tr("Exit the application"));
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+
+    fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu->addAction(quitAction);
 
     trayIconMenu = new QMenu(this);
     trayIconMenu->addAction(quitAction);
@@ -37,6 +42,20 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(systemTrayActivated(QSystemTrayIcon::ActivationReason)));
 
     setWindowIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+
+	browserModel = new QFileSystemModel(this);
+	QString path = QString("%1");
+	path = path.arg(getenv("HOME"));
+	browserModel->setReadOnly(true);
+	browserModel->setRootPath(path);
+	ui->browserTreeView->setModel(browserModel);
+	ui->browserLineEdit->setText(browserModel->rootPath());
+	connect(browserModel, SIGNAL(rootPathChanged(QString)), ui->browserLineEdit, SLOT(setText(QString)));
+	ui->browserTreeView->setRootIndex(browserModel->index(getenv("HOME")));
+
+    // Demonstrating look and feel features
+	ui->browserTreeView->setAnimated(false);
+	ui->browserTreeView->setIndentation(20);
 
     if (!remote.connect())
         QMessageBox::critical(this, tr("CMus connection Error"), tr("Couldn't connect to CMus. Please check your settings"));
