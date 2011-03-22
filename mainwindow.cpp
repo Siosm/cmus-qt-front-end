@@ -81,14 +81,10 @@ void MainWindow::newSongPlayed(const QString& artist,
                    const QString& file,
                    unsigned int duration)
 {
-	QString totalPlayTime("");
-	int		tmpDuration = duration;
-	int		tmpHour = 0;
-	int		tmpMin = 0;
     ui->playingSlider->setMaximum(duration);
-	if(album == "" || artist == "" || title == ""){
-		ui->filenameLabel->setText(file);
-	}
+//	if(album == "" || artist == "" || title == ""){
+//		ui->filenameLabel->setText(file);
+//	}
     ui->artistLabel->setText(artist);
     ui->albumLabel->setText(album);
     ui->trackNameLabel->setText(title);
@@ -114,10 +110,10 @@ void MainWindow::systemTrayActivated(QSystemTrayIcon::ActivationReason reason)
 void MainWindow::playPause()
 {
 	if(remote.state() == QCmusRemote::PLAYING){
-		ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+//		ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 		remote.pause();
 	}else{
-		ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
+//		ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
 		remote.play();
 	}
 }
