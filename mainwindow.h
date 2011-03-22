@@ -21,6 +21,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+	void playPause();
+
 private slots:
     void cmusStateChanged(QCmusRemote::CMusState curState);
     void newSongPlayed(const QString& artist,

@@ -10,7 +10,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->previousButton->setIcon(style()->standardIcon(QStyle::SP_MediaSkipBackward));
     ui->nextButton->setIcon(style()->standardIcon(QStyle::SP_MediaSkipForward));
-    ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+
+	//if (remote.state() == QCmusRemote::PLAYING)
+		//ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
+	//else
+		ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 
     connect(&remote, SIGNAL(stateChanged(QCmusRemote::CMusState)), this, SLOT(cmusStateChanged(QCmusRemote::CMusState)));
     connect(&remote, SIGNAL(volumeUpdated(int)), ui->volumeSlider, SLOT(setValue(int)));
@@ -20,8 +24,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&remote, SIGNAL(newSongPlayed(QString,QString,QString,QString,uint)), this, SLOT(newSongPlayed(QString,QString,QString,QString,uint)));
 
     connect(ui->previousButton, SIGNAL(clicked()), &remote, SLOT(prev()));
-    connect(ui->playButton, SIGNAL(clicked()), &remote, SLOT(pause()));
+	connect(ui->playButton, SIGNAL(clicked()), this, SLOT(playPause()));
     connect(ui->nextButton, SIGNAL(clicked()), &remote, SLOT(next()));
+
 
     //FIXME : find the right icon for the quit action!
     quitAction = new QAction(style()->standardIcon(QStyle::SP_DialogCloseButton), tr("&Quit"), this);
@@ -48,14 +53,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	path = path.arg(getenv("HOME"));
 	browserModel->setReadOnly(true);
 	browserModel->setRootPath(path);
-	ui->browserTreeView->setModel(browserModel);
+	ui->browserListView->setModel(browserModel);
 	ui->browserLineEdit->setText(browserModel->rootPath());
 	connect(browserModel, SIGNAL(rootPathChanged(QString)), ui->browserLineEdit, SLOT(setText(QString)));
-	ui->browserTreeView->setRootIndex(browserModel->index(getenv("HOME")));
-
-    // Demonstrating look and feel features
-	ui->browserTreeView->setAnimated(false);
-	ui->browserTreeView->setIndentation(20);
+	ui->browserListView->setRootIndex(browserModel->index(getenv("HOME")));
 
     if (!remote.connect())
         QMessageBox::critical(this, tr("CMus connection Error"), tr("Couldn't connect to CMus. Please check your settings"));
@@ -80,7 +81,14 @@ void MainWindow::newSongPlayed(const QString& artist,
                    const QString& file,
                    unsigned int duration)
 {
+	QString totalPlayTime("");
+	int		tmpDuration = duration;
+	int		tmpHour = 0;
+	int		tmpMin = 0;
     ui->playingSlider->setMaximum(duration);
+	if(album == "" || artist == "" || title == ""){
+		ui->filenameLabel->setText(file);
+	}
     ui->artistLabel->setText(artist);
     ui->albumLabel->setText(album);
     ui->trackNameLabel->setText(title);
@@ -91,10 +99,25 @@ void MainWindow::systemTrayActivated(QSystemTrayIcon::ActivationReason reason)
     switch(reason){
         case QSystemTrayIcon::Trigger:
         case QSystemTrayIcon::DoubleClick:
+		case QSystemTrayIcon::MiddleClick:
             if(this->isVisible())
                 QMainWindow::setVisible(false);
             else
                 QMainWindow::setVisible(true);
             break;
+		case QSystemTrayIcon::Unknown:
+		case QSystemTrayIcon::Context:
+			break;
     }
+}
+
+void MainWindow::playPause()
+{
+	if(remote.state() == QCmusRemote::PLAYING){
+		ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+		remote.pause();
+	}else{
+		ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
+		remote.play();
+	}
 }
