@@ -43,8 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     trayIcon->show();
-    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-            this, SLOT(systemTrayActivated(QSystemTrayIcon::ActivationReason)));
+	connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(systemTrayActivated(QSystemTrayIcon::ActivationReason)));
 
     setWindowIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 
@@ -59,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->browserListView->setRootIndex(browserModel->index(getenv("HOME")));
 
     if (!remote.connect())
-        QMessageBox::critical(this, tr("CMus connection Error"), tr("Couldn't connect to CMus. Please check your settings"));
+		QMessageBox::critical(this, tr("CMus connection Error"), tr("Couldn't connect to CMus. Please check your settings"));
 }
 
 MainWindow::~MainWindow()
