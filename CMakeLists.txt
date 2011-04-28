@@ -23,6 +23,13 @@ SET(qtmus_source	"${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
 					"${CMAKE_CURRENT_SOURCE_DIR}/qcmusremote.cpp"
 					)
 
+SET(qtmus_moc		"${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.h"
+#					"${CMAKE_CURRENT_SOURCE_DIR}/mainwindow2.h"
+					"${CMAKE_CURRENT_SOURCE_DIR}/qcmusremote.h"
+					)
+
+QT4_WRAP_CPP(qtmus_source ${qtmus_moc})
+
 # QT4_ADD_RESOURCES(qtmus_source "${CMAKE_CURRENT_SOURCE_DIR}/icons.qrc")
 	
 SET(qtmus_uis    	"${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.ui"
