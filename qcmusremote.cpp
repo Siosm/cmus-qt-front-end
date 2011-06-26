@@ -2,7 +2,7 @@
 #include <QStringList>
 
 QCmusRemote::QCmusRemote(QObject *parent) :
-    QObject(parent), socket(NULL)
+    QObject(parent)
 {
     QObject::connect(&upTimer, SIGNAL(timeout()), this, SLOT(update()));
     setRefreshInterval(250);
@@ -52,67 +52,21 @@ void QCmusRemote::statusUpdated(QMap<QString, QString> newState)
         emit statusUpdated();
 }
 
-QByteArray QCmusRemote::sendCmd(QString cmd)
-{
-    QByteArray ret;
-
-    if (!socket || cmd == QString())
-        return QByteArray();
-
-    if (cmd.right(1) != "\n")
-        cmd += "\n";
-
-    qint64 wr_len = socket->write(cmd.toAscii());
-
-    socket->waitForReadyRead(100);
-
-    while (socket->isReadable() && ret.right(2) != "\n\n" && ret != "\n")
-    {
-        char buf[999];
-        qint64 len = socket->readLine(buf, sizeof(buf));
-        ret.append(buf, len);
-    }
-
-//qDebug("cmd = '%s', ret = '%s'", qPrintable(cmd), ret.constData());
-
-    return ret;
-}
-
 bool QCmusRemote::connect(const QString& path)
 {
-    localSocket.connectToServer(path);
-
-    if (localSocket.waitForConnected())
-    {
-        socket = dynamic_cast<QIODevice*>(&localSocket);
-        return true;
-    }
-    else
-        return false;
+    return cmus1.connect(path) && cmus2.connect(path);
 }
 
 bool QCmusRemote::connect(const QHostAddress& address,
                           quint16 port,
                           const QString& pwd)
 {
-    tcpSocket.connectToHost(address, port);
-
-    if (tcpSocket.waitForConnected())
-    {
-        socket = dynamic_cast<QIODevice*>(&tcpSocket);
-        sendCmd(pwd);
-        return true;
-    }
-    else
-        return false;
+    return cmus1.connect(address, port, pwd) && cmus2.connect(address, port, pwd);
 }
 
 bool QCmusRemote::connect()
 {
-    QString path = QString("%1/.cmus/socket");
-    path = path.arg(getenv("HOME"));
-
-    return connect(path);
+    return cmus1.connect() && cmus2.connect();
 }
 
 void QCmusRemote::setRefreshInterval(unsigned int msec)
@@ -125,10 +79,10 @@ bool QCmusRemote::update()
 {
     QMap<QString, QString> newState;
 
-    if (!socket)
+    if (!cmus1.isConnected())
         return false;
 
-    QString ret(sendCmd("status"));
+    QString ret(cmus1.sendCmd_sync("status"));
 
     QStringList lines = ret.split('\n');
     foreach ( const QString &line, lines ) {
@@ -147,57 +101,72 @@ bool QCmusRemote::update()
 
     statusUpdated(newState);
 
+    updatePlaylist();
+
     return true;
+}
+
+void QCmusRemote::updatePlaylist()
+{
+    QList<QSharedPointer<QCmusSong> > playlist;
+
+    QString cmus_playlist = QString(cmus2.dataReturned());
+
+    QStringList songs = cmus_playlist.split("file ");
+    foreach(QString song, songs)
+        playlist.append(QSharedPointer<QCmusSong>(new QCmusSong("file " + song)));
+
+    emit playlistUpdated(playlist);
+
+    cmus2.sendCmd_async("save -p -e -");
 }
 
 void QCmusRemote::toogleRepeat()
 {
-    sendCmd("toggle repeat");
+    cmus1.sendCmd_sync("toggle repeat");
 }
 
 void QCmusRemote::tootleShuffle()
 {
-    sendCmd("toggle repeat");
+    cmus1.sendCmd_sync("toggle repeat");
 }
 
 void QCmusRemote::stop()
 {
-    sendCmd("player-stop");
+    cmus1.sendCmd_sync("player-stop");
 }
 
 void QCmusRemote::next()
 {
-    sendCmd("player-next");
+    cmus1.sendCmd_sync("player-next");
 }
 
 void QCmusRemote::prev()
 {
-    sendCmd("player-prev");
+    cmus1.sendCmd_sync("player-prev");
 }
 
 void QCmusRemote::play()
 {
-    sendCmd("player-play");
+    cmus1.sendCmd_sync("player-play");
 }
 
 void QCmusRemote::pause()
 {
-    sendCmd("player-pause");
+    cmus1.sendCmd_sync("player-pause");
 }
 
 void QCmusRemote::playFile(const QString& file)
 {
-    sendCmd(QString("player-play %1").arg(file));
+    cmus1.sendCmd_sync(QString("player-play %1").arg(file));
 }
 
 void QCmusRemote::setVolume(int vol)
 {
-    sendCmd(QString("vol %1").arg(vol*255/100));
-    qDebug("Set volume %i", vol*255/100);
+    cmus1.sendCmd_sync(QString("vol %1").arg(vol*255/100));
 }
 
 void QCmusRemote::setPosition(int pos)
 {
-    sendCmd(QString("seek %1").arg(pos));
-    qDebug("Set position!");
+    cmus1.sendCmd_sync(QString("seek %1").arg(pos));
 }

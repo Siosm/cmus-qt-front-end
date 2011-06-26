@@ -2,11 +2,13 @@
 #define QCMUSREMOTE_H
 
 #include <QObject>
-#include <QTcpSocket>
-#include <QLocalSocket>
 #include <QHostAddress>
 #include <QTimer>
 #include <QMap>
+#include <QSharedPointer>
+
+#include "qcmusconnection.h"
+#include "qcmussong.h"
 
 class QCmusRemote : public QObject
 {
@@ -16,18 +18,17 @@ public:
 
 private:
     QTimer upTimer;
-    QTcpSocket tcpSocket;
-    QLocalSocket localSocket;
-    QIODevice* socket;
-
+    QCmusConnection cmus1, cmus2;
     CMusState curState;
     QMap<QString, QString> status;
 
     void statusUpdated(QMap<QString, QString> newState);
-    QByteArray sendCmd(QString cmd);
 
 public:
     explicit QCmusRemote(QObject *parent = 0);
+
+    /* Playlist */
+    void updatePlaylist();
 
     /* Current state */
     CMusState state() const { return curState; }
@@ -57,6 +58,7 @@ public:
 
 signals:
     void statusUpdated();
+    void playlistUpdated(QList<QSharedPointer<QCmusSong> > playlist);
 
     /* Helpers */
     void stateChanged(QCmusRemote::CMusState curState);
